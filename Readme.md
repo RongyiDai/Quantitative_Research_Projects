@@ -41,17 +41,7 @@ Options features observed on day \(t\) are used to predict the return from day \
 The primary forecasting model is an OLS regression:
 
 $$
-r_{t+1}
-=
-\beta_0
-+
-\beta_1 IV_t
-+
-\beta_2 \Delta IV_t
-+
-\beta_3 PCR_t
-+
-\epsilon_{t+1}.
+r_{t+1}=\beta_0 + \beta_1 IV_t + \beta_2 \Delta IV_t + \beta_3 PCR_t + \epsilon_{t+1}.
 $$
 
 To preserve the temporal structure of the data, I use **expanding-window out-of-sample validation** rather than a random train/test split.
