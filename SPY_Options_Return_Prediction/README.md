@@ -1,7 +1,3 @@
-# Quantitative Research Projects
-
-This repository contains quantitative finance research projects focused on empirical modeling, financial data analysis, and out-of-sample evaluation. My goal is to apply statistical and mathematical methods to financial questions while emphasizing careful feature construction, validation, and interpretation.
-
 ## Predicting Short-Horizon SPY Returns Using Options Market Signals
 
 ### Research Question
