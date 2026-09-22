@@ -30,9 +30,9 @@ I also construct **25-delta volatility skew** as an exploratory feature to measu
 
 The prediction target is the subsequent close-to-close SPY return:
 
-\[
+$$
 r_{t+1} = \frac{P_{t+1}}{P_t} - 1.
-\]
+$$
 
 Options features observed on day \(t\) are used to predict the return from day \(t\) to the next trading day.
 
@@ -40,7 +40,7 @@ Options features observed on day \(t\) are used to predict the return from day \
 
 The primary forecasting model is an OLS regression:
 
-\[
+$$
 r_{t+1}
 =
 \beta_0
@@ -52,7 +52,7 @@ r_{t+1}
 \beta_3 PCR_t
 +
 \epsilon_{t+1}.
-\]
+$$
 
 To preserve the temporal structure of the data, I use **expanding-window out-of-sample validation** rather than a random train/test split.
 
@@ -66,7 +66,7 @@ Across the July–December out-of-sample period:
 
 | Metric | Primary Model | Zero-Return Baseline |
 | --- | ---: | ---: |
-| Mean Squared Error | \(7.92\times10^{-5}\) | \(7.96\times10^{-5}\) |
+| Mean Squared Error | $7.92\times10^{-5}$ | $7.96\times10^{-5}$ |
 | MSE Improvement | ~0.58% | — |
 | Prediction Correlation | ~0.10 | — |
 
