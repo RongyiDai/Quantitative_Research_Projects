@@ -16,6 +16,35 @@ The analysis uses daily SPY option-chain and underlying-price data for 2024.
 
 Each option observation contains information including strike, expiration, option type, volume, open interest, implied volatility, and Greeks.
 
+### Data Source and Reproduction
+
+The historical SPY options data used in this project are obtained from the public options-dataset-hist repository. The dataset is not duplicated in this repository because of its size.
+
+The source repository can be cloned with:
+
+<git clone --depth 1 https://github.com/anahatsingh-ui/options-dataset-hist.git>
+
+The analysis uses:
+
+<options-dataset-hist/spy/options_2024.parquet
+options-dataset-hist/spy/underlying_prices.parquet>
+
+The notebook loads these files using:
+
+<import pandas as pd
+
+options = pd.read_parquet(
+    "options-dataset-hist/spy/options_2024.parquet"
+)
+
+underlying = pd.read_parquet(
+    "options-dataset-hist/spy/underlying_prices.parquet"
+)>
+
+After cloning the data repository, the notebook can be run sequentially from top to bottom to reproduce the feature construction, exploratory analysis, and model evaluation.
+
+Data-quality note: During exploratory analysis, the supplied implied-volatility field was found to contain discretized values. The project therefore treats the provided IV as a coarse options-market signal rather than reconstructing implied volatility from option prices.
+
 ### Signals
 
 I construct three primary options-market signals:
