@@ -1,118 +1,38 @@
-## Predicting Short-Horizon SPY Returns Using Options Market Signals
+# Predicting Short-Horizon SPY Returns Using Options Market Signals
 
-### Research Question
+This project investigates whether simple signals derived from the SPY options market contain information about subsequent SPY returns.
 
-Do simple signals extracted from the SPY options market contain information about subsequent one-day SPY returns?
+## Overview
 
-This project investigates whether information embedded in option prices and trading activity can help predict next-day SPY returns.
+Using daily SPY option-chain data, I construct four options-market signals:
 
-### Data
+- Near-30-day at-the-money implied volatility
+- Daily change in ATM implied volatility
+- Put/call volume ratio
+- 25-delta volatility skew
 
-The analysis uses daily SPY option-chain and underlying-price data for 2024.
+I evaluate their ability to predict next-day and five-day SPY returns using linear regression with chronological expanding-window out-of-sample validation. Forecasts are compared against a zero-return baseline.
 
-Each option observation contains information including strike, expiration, option type, volume, open interest, implied volatility, and Greeks.
+The analysis also compares overlapping and non-overlapping five-day return windows to examine the robustness of apparent longer-horizon predictability.
 
-### Data Source and Reproduction
+## Main Findings
 
-The historical SPY options data used in this project are obtained from the public options-dataset-hist repository. The dataset is not duplicated in this repository because of its size.
+- The models show limited out-of-sample predictive performance for next-day SPY returns.
+- Predictive performance appears stronger for overlapping five-day returns, but weakens substantially when evaluated using non-overlapping five-day windows.
+- Adding volatility skew provides some incremental information at the five-day horizon, but does not establish robust out-of-sample return predictability.
+- The results highlight the importance of target construction, temporal validation, and robustness checks when evaluating financial forecasting models.
 
-The source repository can be cloned with:
+## Methodology
 
-<git clone --depth 1 https://github.com/anahatsingh-ui/options-dataset-hist.git>
+The project emphasizes a small set of economically motivated features rather than extensive feature or model selection. Models are evaluated chronologically using expanding training windows, with training observations restricted to labels that would have been available at the beginning of each test period to avoid look-ahead bias.
 
-The analysis uses:
+## Tools
 
-<options-dataset-hist/spy/options_2024.parquet
-options-dataset-hist/spy/underlying_prices.parquet>
+Python, Pandas, NumPy, Statsmodels, Matplotlib
 
-The notebook loads these files using:
+## Repository
 
-<import pandas as pd
-
-options = pd.read_parquet(
-    "options-dataset-hist/spy/options_2024.parquet"
-)
-
-underlying = pd.read_parquet(
-    "options-dataset-hist/spy/underlying_prices.parquet"
-)>
-
-After cloning the data repository, the notebook can be run sequentially from top to bottom to reproduce the feature construction, exploratory analysis, and model evaluation.
-
-Data-quality note: During exploratory analysis, the supplied implied-volatility field was found to contain discretized values. The project therefore treats the provided IV as a coarse options-market signal rather than reconstructing implied volatility from option prices.
-
-### Signals
-
-I construct three primary options-market signals:
-
-- **Near-30-day ATM implied volatility:** a measure of the market's pricing of uncertainty over approximately a one-month horizon.
-- **Change in ATM implied volatility:** captures daily repricing of expected volatility.
-- **Put/call volume ratio:** measures relative put and call trading activity using options with 8–60 days to expiration and absolute delta between 0.2 and 0.8.
-
-I also construct **25-delta volatility skew** as an exploratory feature to measure the difference between downside put IV and upside call IV.
-
-### Prediction Target
-
-The prediction target is the subsequent close-to-close SPY return:
-
-$$
-r_{t+1} = \frac{P_{t+1}}{P_t} - 1.
-$$
-
-Options features observed on day \(t\) are used to predict the return from day \(t\) to the next trading day.
-
-### Methodology
-
-The primary forecasting model is an OLS regression:
-
-$$
-r_{t+1}=\beta_0 + \beta_1 IV_t + \beta_2 \Delta IV_t + \beta_3 PCR_t + \epsilon_{t+1}.
-$$
-
-To preserve the temporal structure of the data, I use **expanding-window out-of-sample validation** rather than a random train/test split.
-
-The model is initially trained on January–June 2024 and evaluated sequentially from July through December. After each test month, the training window expands to incorporate the newly observed data.
-
-Performance is compared against a simple **zero-return forecast**.
-
-### Key Results
-
-Across the July–December out-of-sample period:
-
-| Metric | Primary Model | Zero-Return Baseline |
-| --- | ---: | ---: |
-| Mean Squared Error | $7.92\times10^{-5}$ | $7.96\times10^{-5}$ |
-| MSE Improvement | ~0.58% | — |
-| Prediction Correlation | ~0.10 | — |
-
-The options-derived signals exhibit a weak positive out-of-sample relationship with subsequent SPY returns, but the improvement in forecast accuracy is small and varies substantially across individual months.
-
-Adding 25-delta volatility skew does not improve out-of-sample performance: the extended model produces slightly higher MSE and lower prediction correlation than the primary three-feature specification. I therefore retain the simpler model.
-
-### Main Takeaway
-
-The results provide limited evidence that simple options-market signals contain information about next-day SPY returns. However, the magnitude of the forecasting improvement is small and unstable across time.
-
-The project illustrates the difficulty of translating economically motivated financial signals into robust short-horizon return forecasts and highlights the importance of comparing predictive models against simple benchmarks using chronological out-of-sample evaluation.
-
-### Limitations
-
-Several limitations should be considered when interpreting the results:
-
-- The dataset contains only one year of observations, limiting statistical power and coverage of different market regimes.
-- Implied-volatility values in the source data are discretized, reducing the precision of volatility-based features.
-- Precise intraday timestamps are unavailable, so the analysis tests statistical predictability rather than an immediately executable closing-price trading strategy.
-- ATM volatility and 25-delta skew use nearest available contracts rather than full volatility-surface interpolation.
-- Put/call volume can reflect hedging, spreads, volatility trading, and market-making activity in addition to directional positioning.
-- Feature development and evaluation use the same 2024 dataset, so the results should not be interpreted as a fully independent test of a frozen research specification.
-
-### Potential Extensions
-
-With a longer and higher-quality options dataset, natural extensions include:
-
-- Testing the frozen specification across multiple years and market regimes.
-- Constructing exact constant-maturity volatility and interpolated delta-based skew.
-- Investigating whether options signals better predict future realized volatility or tail risk than the conditional mean of next-day returns.
+The Jupyter notebook contains the full workflow, including data cleaning, feature construction, exploratory analysis, out-of-sample evaluation, robustness checks, and discussion of limitations.
 
 ### Notebook
 
